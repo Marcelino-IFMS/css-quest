@@ -236,7 +236,7 @@ export default function SelectorChallenge({ order }: Props) {
             onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleSubmit())}
             placeholder="ex: p { color: red; }"
             spellCheck={false}
-            className="flex-1 font-mono text-sm py-3 outline-none"
+            className="flex-1 font-mono text-red-900 text-sm py-3 outline-none"
           />
           <span className="text-xs font-mono text-gray-400 whitespace-nowrap">{matchCount}</span>
         </div>
