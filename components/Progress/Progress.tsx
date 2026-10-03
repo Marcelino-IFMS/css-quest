@@ -1,13 +1,12 @@
-import { challenges } from "@/lib/challenges";
 import { levelFromXp } from "@/lib/scoring";
 
 type ProgressProps = {
   completedCount: number;
   totalXp: number;
+  total: number;
 };
 
-export default function Progress({ completedCount, totalXp }: ProgressProps) {
-  const total = challenges.length;
+export default function Progress({ completedCount, totalXp, total }: ProgressProps) {
   const pct = Math.round((completedCount / total) * 100);
   const { level, xpIntoLevel, xpForNextLevel } = levelFromXp(totalXp);
 

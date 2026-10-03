@@ -1,7 +1,17 @@
 # CSS Quest
 
-Jogo educativo para ensinar CSS: o aluno recebe uma missão (ex: "pinte a camiseta de azul"),
-escreve a regra CSS, vê o personagem mudar em tempo real, e confere se acertou.
+Jogo educativo para ensinar CSS, em 2 módulos:
+
+- **Módulo 1 · Seletores** — o aluno escreve a regra CSS completa (seletor + propriedade)
+  num documento de referência fixo, e vê os elementos certos se destacarem ao vivo.
+  10 fases, progressão: tag → id → classe → combinações de 2 e 3 propriedades.
+- **Módulo 2 · Propriedades** — o aluno veste um personagem com CSS, uma propriedade
+  por fase (`background-color`, `color`, `width`... até `margin`). Só destrava depois
+  do Módulo 1 inteiro completo.
+
+Inclui um **painel do professor** (`/admin`) para acompanhar o progresso de cada aluno
+em tempo real, nos dois módulos, com um selo "pronto para competição" assim que o
+aluno termina o Módulo 1 — pensado para separar a etapa de treino da etapa de disputa.
 
 ## Rodando localmente
 
@@ -18,24 +28,29 @@ mas não persiste de verdade. Para persistência real, configure o Redis (abaixo
 
 ```
 app/
-  page.tsx                  → tela inicial (nome do jogador + mapa de fases)
-  jogo/[lesson]/page.tsx     → tela de uma missão específica
-  api/progress/route.ts      → GET/POST do progresso (Redis ou memória)
+  page.tsx                   → tela inicial (nome do jogador + mapa dos 2 módulos)
+  admin/page.tsx              → painel do professor (progresso de todos os alunos)
+  selecao/[fase]/page.tsx      → tela de uma fase do Módulo 1 (seletores)
+  jogo/[lesson]/page.tsx        → tela de uma fase do Módulo 2 (propriedades)
+  api/progress/route.ts          → GET/POST do progresso + ranking (Redis ou memória)
 
 components/
-  Character/     → personagem em HTML+CSS, recebe o CSS do aluno
-  CssEditor/      → editor de texto simples
-  Challenge/      → junta missão + personagem + editor + validação
-  Feedback/       → acerto/erro com explicação
-  Progress/       → barra de fases e XP
-  Hint/           → dica progressiva (texto → erro comum)
+  SelectorChallenge/  → Módulo 1: documento de referência + destaque ao vivo + campo único
+  Character/           → Módulo 2: personagem em HTML+CSS, recebe o CSS do aluno
+  CssEditor/             → editor de texto simples (Módulo 2)
+  Challenge/              → junta missão + personagem + editor + validação (Módulo 2)
+  Feedback/                → acerto/erro com explicação (Módulo 2)
+  Progress/                 → barra de fases e XP (tela inicial)
+  Hint/                      → dica progressiva (texto → erro comum) (Módulo 2)
 
 lib/
-  challenges.ts      → as 12 fases (edite aqui para adicionar/mudar desafios)
-  css-validator.ts   → compara o CSS do aluno com o esperado
-  scoring.ts          → cálculo de XP
-  redis.ts             → acesso ao Vercel KV, com fallback em memória
-  usePlayer.ts          → hook de identidade do jogador (localStorage + API)
+  selector-challenges.ts  → as 10 fases do Módulo 1 (documento fixo + seletor esperado)
+  challenges.ts            → as 12 fases do Módulo 2 (edite aqui para adicionar/mudar)
+  rule-parser.ts             → parser da regra CSS de campo único (Módulo 1)
+  css-validator.ts             → compara o CSS do aluno com o esperado (Módulo 2)
+  scoring.ts                     → cálculo de pontos/XP dos dois módulos
+  redis.ts                         → acesso ao Vercel KV, com fallback em memória
+  usePlayer.ts                      → hook de identidade do jogador (localStorage + API)
 ```
 
 ## As 12 fases (nessa ordem)
@@ -56,6 +71,14 @@ lib/
 Para adicionar, remover ou reordenar fases, edite só o arquivo `lib/challenges.ts`.
 Cada fase é um objeto com a missão, o seletor e valor esperados, uma dica, e um
 exemplo de erro comum — nada disso exige mexer em nenhum componente.
+
+## Painel do professor
+
+Acesse `/admin` para ver todos os alunos que já jogaram, ordenados por pontuação,
+com o progresso de cada um nos dois módulos separadamente e o selo **pronto para
+competição** assim que completam o Módulo 1. A lista atualiza sozinha a cada 15
+segundos (ou clique em "Atualizar agora"). Sem nenhuma senha por enquanto — é só um
+link que só você precisa saber.
 
 ## Configurando o Redis (Vercel KV) para persistência real
 
@@ -82,8 +105,13 @@ Depois do primeiro deploy, configure o Redis como descrito acima.
 ## Testes feitos antes da entrega
 
 - `npm run build` passa sem erros (TypeScript + ESLint)
-- Fluxo completo testado num navegador real: nome → mapa de fases → missão →
-  preview ao vivo → acerto → próxima fase desbloqueada
-- Validador testado com 9 casos (acerto, erro de sintaxe, seletor errado,
-  propriedade errada, valores alternativos como hex, etc.) — todos passando
+- Módulo 1: as 10 fases resolvidas automaticamente num navegador real, uma por uma,
+  todas validando corretamente (seletor + propriedades, incluindo fases com 2 e 3
+  propriedades na mesma regra)
+- Confirmado que o Módulo 2 fica trancado até o Módulo 1 estar 100% completo, e
+  destrava sozinho na hora certa
+- Painel do professor testado com múltiplos alunos simulados: progresso por módulo,
+  nível, pontos e selo de "pronto para competição" aparecendo corretamente
+- Validador do Módulo 2 testado com 9 casos (acerto, erro de sintaxe, seletor
+  errado, propriedade errada, valores alternativos como hex, etc.)
 - Sistema de dica progressiva testado (dica → erro comum)

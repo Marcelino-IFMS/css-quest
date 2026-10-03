@@ -37,7 +37,7 @@ export async function saveProgress(playerId: string, record: ProgressRecord): Pr
   await kv.set(`progress:${playerId}`, record);
 }
 
-export async function getLeaderboard(limit = 10): Promise<ProgressRecord[]> {
+export async function getLeaderboard(limit = 60): Promise<ProgressRecord[]> {
   if (!hasKvConfigured) {
     return Array.from(memoryStore.values())
       .sort((a, b) => b.totalXp - a.totalXp)

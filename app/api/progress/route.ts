@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
   const leaderboard = request.nextUrl.searchParams.get("leaderboard");
 
   if (leaderboard === "true") {
-    const top = await getLeaderboard(10);
+    const top = await getLeaderboard(60);
     return NextResponse.json({ leaderboard: top });
   }
 
