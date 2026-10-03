@@ -14,7 +14,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "CSS Quest",
+  title: "CSS Quest Agora Vai",
   description: "Aprenda CSS resolvendo missões e vestindo o personagem.",
 };
 
